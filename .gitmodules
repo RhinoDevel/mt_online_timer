@@ -1,0 +1,3 @@
+[submodule "nodejs-fritzbox"]
+	path = nodejs-fritzbox
+	url = https://github.com/RhinoDevel/nodejs-fritzbox.git
