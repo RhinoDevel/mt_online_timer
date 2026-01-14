@@ -72,6 +72,11 @@ function getTimestampSeconds(dateTime)
     return Math.trunc(dateTime.getTime() / 1000.0);
 }
 
+function getDayStr(dateTime)
+{
+    return dateTime.toISOString().slice(0, 10);
+}
+
 function saveState(state)
 {
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
@@ -82,16 +87,18 @@ function saveState(state)
  */
 function getUpToDateState()
 {
-    let state = null;
     const dateTimeNow = new Date();
-    const dayStr = dateTime.toISOString().slice(0, 10);
+    let state = null;
     let isRunning = false;
 
     if (fs.existsSync(ABS_PATH_STATE))
     {
+        const timestampDayStr =
+            getDayStr(new Date(1000.0 * state.timestampSeconds));
+
         state = JSON.parse(fs.readFileSync(ABS_PATH_STATE));
 
-        if(state.dayStr === dayStr)
+        if(timestampDayStr === getDayStr(dateTimeNow))
         {
             return state; // Still the same day, nothing to do.
         }
@@ -106,7 +113,6 @@ function getUpToDateState()
     state = {
         isRunning: isRunning,
         remainingSeconds: FULL_SECONDS,
-        dayStr: dayStr,
         timestampSeconds: getTimestampSeconds(dateTimeNow),
     };
 
