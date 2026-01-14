@@ -105,7 +105,7 @@ function getUpToDateState()
         remainingSeconds: FULL_SECONDS,
         isLocked: false,
         dayStr: dayStr,
-        lastTimestampSeconds: getTimestampSeconds(dateTimeNow),
+        timestampSeconds: getTimestampSeconds(dateTimeNow),
     };
 
     saveState(state); // Makes sure that file reflects current state.
@@ -125,9 +125,9 @@ async function intervalHandler()
         }
         
         const curTimestampSeconds = getTimestampSeconds(Date.now());
-        const elapsedSeconds = curTimestampSeconds - state.lastTimestampSeconds;
+        const elapsedSeconds = curTimestampSeconds - state.timestampSeconds;
 
-        state.lastTimestampSeconds = curTimestampSeconds;
+        state.timestampSeconds = curTimestampSeconds;
         state.remainingSeconds -= elapsedSeconds;
 
         if (state.remainingSeconds <= 0.0)
@@ -215,7 +215,7 @@ async function httpReqHandler(req, res)
                  setInternetAccess(CLIENT_IP, true);
 
                 state.isRunning = true;
-                state.lastTimestampSeconds = getTimestampSeconds(Date.now());
+                state.timestampSeconds = getTimestampSeconds(Date.now());
                 saveState(state);
 
                 // Redirect back to main page.
