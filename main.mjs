@@ -210,7 +210,7 @@ async function httpReqHandler(req, res)
                         `Internet-disable exceptional error with msg. "${err.message}" (1)!`);
 
                     res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end(ERR_EXCEPTION);
+                    res.end(MSG_ERR_EXCEPTION);
                 }
                 return;
             }
@@ -236,7 +236,7 @@ async function httpReqHandler(req, res)
                     `Internet-enable exceptional error with msg. "${err.message}"!`);
 
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end(ERR_EXCEPTION);
+                res.end(MSG_ERR_EXCEPTION);
             }
             return;
         }
@@ -257,7 +257,7 @@ async function httpReqHandler(req, res)
             `Server exceptional error with msg. "${err.message}"!`);
 
         res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end(ERR_EXCEPTION);
+        res.end(MSG_ERR_EXCEPTION);
     }
 }
 
