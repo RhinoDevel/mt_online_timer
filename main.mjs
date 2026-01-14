@@ -104,28 +104,21 @@ function saveState(state)
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
 }
 
-/**
- * - Just returns given object, if nothing to do.
- * - Does NOT change the .isRunning property.
- */
-function getDaySyncState(state)
+function loadOrCreateDaySyncAndSaveState()
 {
+    let state = loadOrCreateState();
+
     if(state.lastDay === getDayStr(new Date()))
     {
         return state; // Still the same day, nothing to do.
     }
-    return createState(state.isRunning); // A new day!
-}
 
-function loadOrCreateDaySyncAndSaveState()
-{
-    let retVal = loadOrCreateState();
+    // The date has changed. => Reset contingent, keep is-running state:
+    state = createState(state.isRunning);
 
-    retVal = getDaySyncState(retVal); // Resets, if it is a new day.
+    saveState(state); // Makes sure that file reflects current state.
 
-    saveState(retVal); // Makes sure that file reflects current state.
-
-    return retVal;
+    return state;
 }
 
 async function intervalHandler()
