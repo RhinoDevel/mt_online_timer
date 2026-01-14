@@ -148,7 +148,7 @@ async function intervalHandler()
             state.remainingSeconds = 0.0; // <=> Locked
             state.isRunning = false;
 
-            console.log('Disabling internet..');
+            console.log('Disabling internet (2)..');
             setInternetAccess(CLIENT_IP, false);
         }
 
@@ -217,6 +217,13 @@ function httpListen()
 {
     console.log(`Listening at port ${String(HTTP_PORT)}..`);
 }
+
+// *****************************************************************************
+// *** DISABLE INTERNET ACCESS                                               ***
+// *****************************************************************************
+
+console.log('Disabling internet (1)..');
+setInternetAccess(CLIENT_IP, false);
 
 // *****************************************************************************
 // *** START INTERVAL TIMER                                                  ***
