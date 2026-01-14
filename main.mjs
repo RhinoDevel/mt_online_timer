@@ -77,6 +77,9 @@ function saveState(state)
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
 }
 
+/**
+ * - Does not change the is-running property.
+ */
 function getUpToDateState()
 {
     let state = null;
@@ -103,7 +106,6 @@ function getUpToDateState()
     state = {
         isRunning: isRunning,
         remainingSeconds: FULL_SECONDS,
-        isLocked: false,
         dayStr: dayStr,
         timestampSeconds: getTimestampSeconds(dateTimeNow),
     };
@@ -113,13 +115,18 @@ function getUpToDateState()
     return state;
 }
 
+/** If timer is currently running (so internet access must be enabled and lock
+ *  must not be set), this function updates the state's time properties (also
+ *  saves to file). It will also disable the internet access for the client IP,
+ *  if state is locked (no more time available). 
+ */
 async function intervalHandler()
 {
     try
     {
-        const state = getUpToDateState();
+        const state = getUpToDateState(); // Won't change is-running property.
 
-        if (!state.isRunning || state.isLocked)
+        if (!state.isRunning)
         {
             return;
         }
@@ -132,28 +139,24 @@ async function intervalHandler()
 
         if (state.remainingSeconds <= 0.0)
         {
-            state.remainingSeconds = 0.0;
+            state.remainingSeconds = 0.0; // <=> Locked
             state.isRunning = false;
-            state.isLocked = true;
 
-            // Disable internet:
-            try
-            {
-                console.log('Disabling internet..');
-                setInternetAccess(CLIENT_IP, false);
-            }
-            catch (err)
-            {
-                console.error(
-                    `Internet-disable exceptional error with msg. "${err.message}" (2)!`);
-            }
+            console.log('Disabling internet..');
+            setInternetAccess(CLIENT_IP, false);
         }
+
         saveState(state);
     }
     catch (err)
     {
         console.error(`Timer exceptional error with msg. "${err.message}"!`);
     }
+}
+
+function isLocked(state)
+{
+    return state.remainingSeconds === 0.0;
 }
 
 async function httpReqHandler(req, res)
@@ -169,7 +172,7 @@ async function httpReqHandler(req, res)
             // *** TOGGLE PAGE ***
             // *******************
 
-            if (state.isLocked)
+            if (isLocked(state))
             {
                 // Already locked.
 
@@ -239,7 +242,7 @@ async function httpReqHandler(req, res)
 
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(
-            state.isLocked
+            isLocked(state)
                 ? 'Leider keine Internet-Minuten mehr vorhanden (morgen wieder).'
                 : `<div>Internet-Minuten: ${Math.trunc(state.remainingSeconds / 60.0)}</div><div><a href="${HTTP_PATHNAME_TOGGLE}"><button>${state.isRunning ? 'Pause' : 'Internet!!!'}</button></a></div>`);
     }
