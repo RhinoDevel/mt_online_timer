@@ -77,19 +77,6 @@ function getDayStr(dateTime)
     return dateTime.toISOString().slice(0, 10);
 }
 
-function createState(isRunning)
-{
-    const dateTimeNow = new Date();
-
-    return {
-        isRunning: isRunning,
-        remainingSeconds: FULL_SECONDS,
-        isLocked: false,
-        lastDay: getDayStr(dateTimeNow),
-        lastTimestampSeconds: getTimestampSeconds(dateTimeNow),
-    };
-}
-
 function saveState(state)
 {
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
@@ -98,13 +85,15 @@ function saveState(state)
 function loadOrCreateDaySyncAndSaveState()
 {
     let state = null;
+    const dateTimeNow = new Date();
+    const dayStr = getDayStr(dateTimeNow);
     let isRunning = false;
 
     if (fs.existsSync(ABS_PATH_STATE))
     {
         state = JSON.parse(fs.readFileSync(ABS_PATH_STATE));
 
-        if(state.lastDay === getDayStr(new Date()))
+        if(state.lastDay === dayStr)
         {
             return state; // Still the same day, nothing to do.
         }
@@ -116,7 +105,13 @@ function loadOrCreateDaySyncAndSaveState()
     // There either was no state file found or the date stored in the loaded
     // state is not today's date.
 
-    state = createState(isRunning);
+    state = {
+        isRunning: isRunning,
+        remainingSeconds: FULL_SECONDS,
+        isLocked: false,
+        lastDay: dayStr,
+        lastTimestampSeconds: getTimestampSeconds(dateTimeNow),
+    };
 
     saveState(state); // Makes sure that file reflects current state.
 
