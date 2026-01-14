@@ -57,8 +57,7 @@ function setInternetAccess(clientIpAddr, isAllowed)
     // This is specific for AVM FritzBox usage as server that provides the API
     // to enable/disable internet access per client IP address:
     fb.exec(
-        (o) =>
-            console.log(`Internet access set request response JSON: "${JSON.stringify(o)}"`),
+        o => console.log(`Internet access set request response JSON: "${JSON.stringify(o)}"`),
         FB_USERNAME,
         FB_PASSWORD,
         FB_ACTION,
@@ -78,12 +77,12 @@ function getDayStr(dateTime)
     return dateTime.toISOString().slice(0, 10);
 }
 
-function createState()
+function createState(isRunning)
 {
     const dateTimeNow = new Date();
 
     return {
-        isRunning: false,
+        isRunning: isRunning,
         remainingSeconds: FULL_SECONDS,
         isLocked: false,
         lastDay: getDayStr(dateTimeNow),
@@ -97,7 +96,7 @@ function loadOrCreateState()
     {
         return JSON.parse(fs.readFileSync(ABS_PATH_STATE));
     }
-    return createState();
+    return createState(false);
 }
 
 function saveState(state)
@@ -105,13 +104,17 @@ function saveState(state)
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
 }
 
+/**
+ * - Just returns given object, if nothing to do.
+ * - Does NOT change the .isRunning property.
+ */
 function getDaySyncState(state)
 {
     if(state.lastDay === getDayStr(new Date()))
     {
         return state; // Still the same day, nothing to do.
     }
-    return createState(); // A new day!
+    return createState(state.isRunning); // A new day!
 }
 
 async function intervalHandler()
