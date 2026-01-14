@@ -77,7 +77,7 @@ function saveState(state)
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
 }
 
-function loadOrCreateDaySyncAndSaveState()
+function getUpToDateState()
 {
     let state = null;
     const dateTimeNow = new Date();
@@ -117,7 +117,7 @@ async function intervalHandler()
 {
     try
     {
-        const state = loadOrCreateDaySyncAndSaveState();
+        const state = getUpToDateState();
 
         if (!state.isRunning || state.isLocked)
         {
@@ -161,7 +161,7 @@ async function httpReqHandler(req, res)
     try
     {
         const parsedUrl = parse(req.url, true); // TODO: Check!
-        const state = loadOrCreateDaySyncAndSaveState();
+        const state = getUpToDateState();
 
         if (parsedUrl.pathname === HTTP_PATHNAME_TOGGLE)
         {
