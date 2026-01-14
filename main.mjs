@@ -88,7 +88,7 @@ function loadOrCreateDaySyncAndSaveState()
     {
         state = JSON.parse(fs.readFileSync(ABS_PATH_STATE));
 
-        if(state.lastDay === dayStr)
+        if(state.dayStr === dayStr)
         {
             return state; // Still the same day, nothing to do.
         }
@@ -104,7 +104,7 @@ function loadOrCreateDaySyncAndSaveState()
         isRunning: isRunning,
         remainingSeconds: FULL_SECONDS,
         isLocked: false,
-        lastDay: dayStr,
+        dayStr: dayStr,
         lastTimestampSeconds: getTimestampSeconds(dateTimeNow),
     };
 
