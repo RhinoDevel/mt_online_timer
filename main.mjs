@@ -137,7 +137,7 @@ async function intervalHandler()
             return;
         }
         
-        const timestampSeconds = getTimestampSeconds(Date.now());
+        const timestampSeconds = getTimestampSeconds(new Date());
         const elapsedSeconds = timestampSeconds - state.timestampSeconds;
 
         state.timestampSeconds = timestampSeconds;
@@ -197,7 +197,7 @@ async function httpReqHandler(req, res)
             state.isRunning
                 ? 'Pausing internet timer..' : '(Re-)enabling internet..');
         state.isRunning = !state.isRunning;
-        setInternetAccess(CLIENT_IP, !state.isRunning);
+        setInternetAccess(CLIENT_IP, state.isRunning);
         saveState(state);
 
         // Redirect back to main page.
