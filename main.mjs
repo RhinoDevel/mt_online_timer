@@ -117,15 +117,22 @@ function getDaySyncState(state)
     return createState(state.isRunning); // A new day!
 }
 
+function loadOrCreateDaySyncAndSaveState()
+{
+    let retVal = loadOrCreateState();
+
+    retVal = getDaySyncState(retVal); // Resets, if it is a new day.
+
+    saveState(retVal); // Makes sure that file reflects current state.
+
+    return retVal;
+}
+
 async function intervalHandler()
 {
     try
     {
-        let state = loadOrCreateState();
-
-        // Make sure that day is up-to-date (haha):
-        state = getDaySyncState(state);
-        saveState(state); // Saves to file.
+        const state = loadOrCreateDaySyncAndSaveState();
 
         if (!state.isRunning || state.isLocked)
         {
@@ -168,11 +175,8 @@ async function httpReqHandler(req, res)
 {
     try
     {
-        let state = loadOrCreateState();
         const parsedUrl = parse(req.url, true); // TODO: Check!
-
-        state = getDaySyncState(state); // Resets, if it is a new day.
-        saveState(state); // Makes sure that file reflects current state.
+        const state = loadOrCreateDaySyncAndSaveState();
 
         if (parsedUrl.pathname === HTTP_PATHNAME_TOGGLE)
         {
