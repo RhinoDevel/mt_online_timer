@@ -72,11 +72,6 @@ function getTimestampSeconds(dateTime)
     return Math.trunc(dateTime.getTime() / 1000.0);
 }
 
-function getDayStr(dateTime)
-{
-    return dateTime.toISOString().slice(0, 10);
-}
-
 function saveState(state)
 {
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
@@ -86,7 +81,7 @@ function loadOrCreateDaySyncAndSaveState()
 {
     let state = null;
     const dateTimeNow = new Date();
-    const dayStr = getDayStr(dateTimeNow);
+    const dayStr = dateTime.toISOString().slice(0, 10);
     let isRunning = false;
 
     if (fs.existsSync(ABS_PATH_STATE))
