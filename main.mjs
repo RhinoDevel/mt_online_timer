@@ -160,16 +160,12 @@ async function intervalHandler()
     }
 }
 
-function isLocked(state)
-{
-    return state.remainingSeconds === 0.0;
-}
-
 async function httpReqHandler(req, res)
 {
     try
     {
         const state = getUpToDateState();
+        const isLocked = state.remainingSeconds === 0.0;
 
         if (parse(req.url, true).pathname !== HTTP_PATHNAME_TOGGLE)
         {
@@ -179,7 +175,7 @@ async function httpReqHandler(req, res)
 
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(
-                isLocked(state)
+                isLocked
                     ? 'Leider keine Internet-Minuten mehr vorhanden (morgen wieder).'
                     : `<div>Internet-Minuten: ${Math.trunc(state.remainingSeconds / 60.0)}</div><div><a href="${HTTP_PATHNAME_TOGGLE}"><button>${state.isRunning ? 'Pause' : 'Internet!!!'}</button></a></div>`);
             return;
@@ -189,7 +185,7 @@ async function httpReqHandler(req, res)
         // *** TOGGLE PAGE ***
         // *******************
 
-        if (isLocked(state))
+        if (isLocked)
         {
             // Redirect back to main page.
             res.writeHead(302, { Location: '/' });
