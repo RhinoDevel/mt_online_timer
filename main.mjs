@@ -90,15 +90,6 @@ function createState(isRunning)
     };
 }
 
-function loadOrCreateState()
-{
-    if (fs.existsSync(ABS_PATH_STATE))
-    {
-        return JSON.parse(fs.readFileSync(ABS_PATH_STATE));
-    }
-    return createState(false);
-}
-
 function saveState(state)
 {
     fs.writeFileSync(ABS_PATH_STATE, JSON.stringify(state));
@@ -106,15 +97,26 @@ function saveState(state)
 
 function loadOrCreateDaySyncAndSaveState()
 {
-    let state = loadOrCreateState();
+    let state = null;
+    let isRunning = false;
 
-    if(state.lastDay === getDayStr(new Date()))
+    if (fs.existsSync(ABS_PATH_STATE))
     {
-        return state; // Still the same day, nothing to do.
+        state = JSON.parse(fs.readFileSync(ABS_PATH_STATE));
+
+        if(state.lastDay === getDayStr(new Date()))
+        {
+            return state; // Still the same day, nothing to do.
+        }
+
+        // The date has changed, we must reset the time contingent, etc.
+        isRunning = state.isRunning; // Keeps is-running state.
     }
 
-    // The date has changed. => Reset contingent, keep is-running state:
-    state = createState(state.isRunning);
+    // There either was no state file found or the date stored in the loaded
+    // state is not today's date.
+
+    state = createState(isRunning);
 
     saveState(state); // Makes sure that file reflects current state.
 
