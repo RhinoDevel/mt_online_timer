@@ -169,93 +169,48 @@ async function httpReqHandler(req, res)
 {
     try
     {
-        const parsedUrl = parse(req.url, true); // TODO: Check!
         const state = getUpToDateState();
 
-        if (parsedUrl.pathname === HTTP_PATHNAME_TOGGLE)
+        if (parse(req.url, true).pathname !== HTTP_PATHNAME_TOGGLE)
         {
-            // *******************
-            // *** TOGGLE PAGE ***
-            // *******************
+            // *****************
+            // *** MAIN PAGE ***
+            // *****************
 
-            if (isLocked(state))
-            {
-                // Already locked.
-
-                // Redirect back to main page.
-                res.writeHead(302, { Location: '/' });
-                res.end();
-                return;
-            }
-
-            // Not locked.
-
-            if (state.isRunning)
-            {
-                // Is running.
-
-                try
-                {
-                    console.log('Pausing internet timer..');
-                    setInternetAccess(CLIENT_IP, false);
-                    state.isRunning = false;
-                    saveState(state);
-                    
-                    // Redirect back to main page.
-                    res.writeHead(302, { Location: '/' });
-                    res.end();
-                }
-                catch (err)
-                {
-                    console.error(
-                        `Internet-disable exceptional error with msg. "${err.message}" (1)!`);
-
-                    res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end(MSG_ERR_EXCEPTION);
-                }
-                return;
-            }
-        
-            // Not running.
-
-            try
-            {
-                console.log('(Re-)enabling internet..');
-                 setInternetAccess(CLIENT_IP, true);
-
-                state.isRunning = true;
-                state.timestampSeconds = getTimestampSeconds(Date.now());
-                saveState(state);
-
-                // Redirect back to main page.
-                res.writeHead(302, { Location: '/' });
-                res.end();
-            }
-            catch (err)
-            {
-                console.error(
-                    `Internet-enable exceptional error with msg. "${err.message}"!`);
-
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end(MSG_ERR_EXCEPTION);
-            }
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(
+                isLocked(state)
+                    ? 'Leider keine Internet-Minuten mehr vorhanden (morgen wieder).'
+                    : `<div>Internet-Minuten: ${Math.trunc(state.remainingSeconds / 60.0)}</div><div><a href="${HTTP_PATHNAME_TOGGLE}"><button>${state.isRunning ? 'Pause' : 'Internet!!!'}</button></a></div>`);
             return;
         }
 
-        // *****************
-        // *** MAIN PAGE ***
-        // *****************
+        // *******************
+        // *** TOGGLE PAGE ***
+        // *******************
 
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(
-            isLocked(state)
-                ? 'Leider keine Internet-Minuten mehr vorhanden (morgen wieder).'
-                : `<div>Internet-Minuten: ${Math.trunc(state.remainingSeconds / 60.0)}</div><div><a href="${HTTP_PATHNAME_TOGGLE}"><button>${state.isRunning ? 'Pause' : 'Internet!!!'}</button></a></div>`);
+        if (isLocked(state))
+        {
+            // Redirect back to main page.
+            res.writeHead(302, { Location: '/' });
+            res.end();
+            return;
+        }
+        
+        console.log(
+            state.isRunning
+                ? 'Pausing internet timer..' : '(Re-)enabling internet..');
+        state.isRunning = !state.isRunning;
+        setInternetAccess(CLIENT_IP, !state.isRunning);
+        saveState(state);
+
+        // Redirect back to main page.
+        res.writeHead(302, { Location: '/' });
+        res.end();        
     }
     catch (err)
     {
-        console.error(
-            `Server exceptional error with msg. "${err.message}"!`);
+        console.error(`Server exceptional error with msg. "${err.message}"!`);
 
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end(MSG_ERR_EXCEPTION);
