@@ -119,9 +119,6 @@ async function intervalHandler()
     try
     {
         let state = loadOrCreateState();
-        const curDateTime = Date.now();
-        const curTimestampSeconds = getTimestampSeconds(curDateTime);
-        const curDayStr = getDayStr(curDateTime);
 
         // Make sure that day is up-to-date (haha):
         state = getDaySyncState(state);
@@ -129,13 +126,13 @@ async function intervalHandler()
 
         if (!state.isRunning || state.isLocked)
         {
-            state.lastTimestampSeconds = curTimestampSeconds;
-            saveState(state);
             return;
         }
         
+        const curTimestampSeconds = getTimestampSeconds(Date.now());
         const elapsedSeconds = curTimestampSeconds - state.lastTimestampSeconds;
 
+        state.lastTimestampSeconds = curTimestampSeconds;
         state.remainingSeconds -= elapsedSeconds;
 
         if (state.remainingSeconds <= 0.0)
@@ -148,9 +145,7 @@ async function intervalHandler()
             try
             {
                 console.log('Disabling internet..');
-
                 setInternetAccess(CLIENT_IP, false);
-                
             }
             catch (err)
             {
@@ -158,8 +153,6 @@ async function intervalHandler()
                     `Internet-disable exceptional error with msg. "${err.message}" (2)!`);
             }
         }
-
-        state.lastTimestampSeconds = now;
         saveState(state);
     }
     catch (err)
