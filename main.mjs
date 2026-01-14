@@ -93,10 +93,10 @@ function getUpToDateState()
 
     if (fs.existsSync(ABS_PATH_STATE))
     {
+        state = JSON.parse(fs.readFileSync(ABS_PATH_STATE));
+        
         const timestampDayStr =
             getDayStr(new Date(1000.0 * state.timestampSeconds));
-
-        state = JSON.parse(fs.readFileSync(ABS_PATH_STATE));
 
         if(timestampDayStr === getDayStr(dateTimeNow))
         {
