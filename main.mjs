@@ -137,10 +137,10 @@ async function intervalHandler()
             return;
         }
         
-        const curTimestampSeconds = getTimestampSeconds(Date.now());
-        const elapsedSeconds = curTimestampSeconds - state.timestampSeconds;
+        const timestampSeconds = getTimestampSeconds(Date.now());
+        const elapsedSeconds = timestampSeconds - state.timestampSeconds;
 
-        state.timestampSeconds = curTimestampSeconds;
+        state.timestampSeconds = timestampSeconds;
         state.remainingSeconds -= elapsedSeconds;
 
         if (state.remainingSeconds <= 0.0)
