@@ -220,6 +220,10 @@ async function httpReqHandler(req, res)
             state.isRunning
                 ? 'Pausing internet timer..' : '(Re-)enabling internet..');
         state.isRunning = !state.isRunning;
+        if(state.isRunning)
+        {
+            state.timestampSeconds = getTimestampSeconds(new Date());
+        }
         setInternetAccess(CLIENT_IP, state.isRunning);
         saveState(state);
 
