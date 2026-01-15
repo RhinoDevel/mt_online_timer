@@ -175,24 +175,32 @@ async function httpReqHandler(req, res)
 
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(
-                '<div style="display: flex; flex-direction: column; align-items: center; font-size: xxx-large;">'
+                '<div style="display: flex; flex-direction: column; align-items: center; gap: 1.0em; margin: 1.5em; font-size: xxx-large;">'
                     + (isLocked
-                        ? `
-    Leider keine Internet-Minuten mehr vorhanden (morgen wieder).
-                            `
-                        : `
-<div>
-    Internet-Minuten: ${Math.trunc(state.remainingSeconds / 60.0)}
-</div>
-<div>
-    <a href="${HTTP_PATHNAME_TOGGLE}">
-        <button style="font-size: inherit;">
-            ${state.isRunning ? 'Pause' : 'Einschalten'}
-        </button>
-    </a>
-</div>
-                            `)
-                + '</div>');
+                        ?
+                    `<div style="text-align: center;">
+                        Leider keine Internet-Minuten mehr vorhanden (morgen wieder).
+                    </div>`
+                        :
+                    `<div style="text-align: center;">
+                        Internet-Minuten: ${Math.trunc(state.remainingSeconds / 60.0)}
+                    </div>
+                    <div style="text-align: center;">
+                        ${state.isRunning ? 'Internet ist <u>eingeschaltet</u> (die Zeit l&auml;uft).' : 'Internet ist <u>ausgeschaltet</u> (die Zeit l&auml;uft nicht).'}
+                    </div>
+                    <div>
+                        <a href="${HTTP_PATHNAME_TOGGLE}">
+                            <button style="font-size: inherit; ${state.isRunning ? 'background-color: red;' : 'background-color: green; color: yellow;'}">
+                                ${state.isRunning ? 'Pause' : 'einschalten'}
+                            </button>
+                        </a>
+                    </div>`)
+                 + `<div>
+                        <button onclick="window.location.reload();" style="font-size: inherit;">
+                            aktualisieren
+                        </button>
+                    </div>
+                </div>`);
             return;
         }
 
