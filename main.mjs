@@ -175,7 +175,15 @@ async function httpReqHandler(req, res)
 
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(
-                '<div style="display: flex; flex-direction: column; align-items: center; gap: 1.0em; margin: 1.5em; font-size: xxx-large;">'
+                `<!DOCTYPE html>
+		    <html style="user-select: none;">
+                        <head>
+                            <meta charset="utf-8">
+                            <title>Internet Timer</title>
+                        </head>
+                        <body>`
+
+                + '<div style="display: flex; flex-direction: column; align-items: center; gap: 1.0em; margin: 1.5em; font-size: xxx-large;">'
                     + (isLocked
                         ?
                     `<div style="text-align: center;">
@@ -200,7 +208,11 @@ async function httpReqHandler(req, res)
                             aktualisieren
                         </button>
                     </div>
-                </div>`);
+                </div>`
+
+                        + `</body>
+                    </html>`
+		);
             return;
         }
 
