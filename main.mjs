@@ -175,21 +175,24 @@ async function httpReqHandler(req, res)
 
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(
-                isLocked
-                    ?
-'Leider keine Internet-Minuten mehr vorhanden (morgen wieder).'
-                    : `
+                '<div style="display: flex; flex-direction: column; align-items: center; font-size: xxx-large;">'
+                    + (isLocked
+                        ? `
+    Leider keine Internet-Minuten mehr vorhanden (morgen wieder).
+                            `
+                        : `
 <div>
     Internet-Minuten: ${Math.trunc(state.remainingSeconds / 60.0)}
 </div>
 <div>
     <a href="${HTTP_PATHNAME_TOGGLE}">
-        <button>
-            ${state.isRunning ? 'Pause' : 'Internet!!!'}
+        <button style="font-size: inherit;">
+            ${state.isRunning ? 'Pause' : 'Einschalten'}
         </button>
     </a>
 </div>
-                `);
+                            `)
+                + '</div>');
             return;
         }
 
