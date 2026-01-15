@@ -251,6 +251,9 @@ function httpListen()
 
 console.log('Disabling internet (1)..');
 setInternetAccess(CLIENT_IP, false);
+const state = getUpToDateState();
+state.isRunning = false;
+saveState(state);
 
 // *****************************************************************************
 // *** START INTERVAL TIMER                                                  ***
